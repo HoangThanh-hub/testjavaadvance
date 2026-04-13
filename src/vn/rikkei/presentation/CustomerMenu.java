@@ -3,6 +3,7 @@ package vn.rikkei.presentation;
 import vn.rikkei.model.CartItem;
 import vn.rikkei.model.Order;
 import vn.rikkei.model.Product;
+import vn.rikkei.model.User;
 import vn.rikkei.service.OrderService;
 import vn.rikkei.service.ProductService;
 
@@ -16,10 +17,12 @@ public class CustomerMenu {
     private static List<CartItem> cart = new ArrayList<>();
     private static OrderService orderService = new OrderService();
     private static ProductService productService = new ProductService();
-    private static int currentUserId;
 
-    public static void setCurrentUserId(int id) {
-        currentUserId = id;
+    private static User currentUser; // 🔥 lưu user login
+
+    // 👉 gọi từ login
+    public static void setCurrentUser(User user) {
+        currentUser = user;
     }
 
     public static void menu() {
@@ -58,6 +61,7 @@ public class CustomerMenu {
                     break;
 
                 case 0:
+                    currentUser = null; // logout
                     return;
 
                 default:
@@ -66,11 +70,11 @@ public class CustomerMenu {
         }
     }
 
-    // hiển thị
+    // hiển thị sản phẩm
     private static void showProducts() {
         System.out.println("\n================================= DANH SÁCH SẢN PHẨM =================================");
 
-        System.out.printf("| %-3s | %-15s | %-10s | %-6s | %-6s | %-12s | %-5s |\n",
+        System.out.printf("| %-3s | %-15s | %-10s | %-10s | %-6s | %-12s | %-5s |\n",
                 "ID", "Tên", "Hãng", "Dung lượng", "Màu", "Giá", "Số lượng");
         System.out.println("--------------------------------------------------------------------------------------");
 
@@ -87,7 +91,7 @@ public class CustomerMenu {
         }
     }
 
-    // add to cart
+    // thêm vào giỏ
     private static void addToCart() {
         System.out.print("\nNhập ID sản phẩm bạn muốn thêm: ");
         int id = Integer.parseInt(sc.nextLine());
@@ -107,7 +111,6 @@ public class CustomerMenu {
             return;
         }
 
-        // xem coi có ở trong giỏ hàng trước chưa
         for (CartItem item : cart) {
             if (item.getProduct().getId() == id) {
                 item.setQuantity(item.getQuantity() + qty);
@@ -120,7 +123,7 @@ public class CustomerMenu {
         System.out.println("\nĐã thêm");
     }
 
-    // show cart
+    // hiển thị giỏ
     private static void showCart() {
 
         if (cart.isEmpty()) {
@@ -157,25 +160,36 @@ public class CustomerMenu {
     // đặt hàng
     private static void placeOrder() {
 
+        if (currentUser == null) {
+            System.out.println("Bạn cần đăng nhập!");
+            return;
+        }
+
         if (cart.isEmpty()) {
             System.out.println("Giỏ trống");
             return;
         }
 
-        if (orderService.placeOrder(currentUserId, cart)) {
-            System.out.println("Đặt hàng thành công");
-            cart.clear();
-        } else {
-            System.out.println("Đặt hàng thất bại");
+        try {
+            orderService.placeOrder(currentUser.getId(), cart);
+            System.out.println("Đặt hàng thành công!");
+            cart.clear(); // clear giỏ sau khi đặt
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
     }
 
-    // history
+    // lịch sử đơn
     private static void showHistory() {
 
-        List<Order> list = orderService.getMyOrders(currentUserId);
+        if (currentUser == null) {
+            System.out.println("Bạn cần đăng nhập!");
+            return;
+        }
 
-        if (list.isEmpty()) {
+        List<Order> list = orderService.getMyOrders(currentUser.getId());
+
+        if (list == null || list.isEmpty()) {
             System.out.println("Chưa có đơn!");
             return;
         }

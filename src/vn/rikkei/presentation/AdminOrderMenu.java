@@ -54,10 +54,11 @@ public class AdminOrderMenu {
                         default -> "CANCELLED";
                     };
 
-                    if (orderService.updateStatus(id, status)) {
+                    try {
+                        orderService.updateStatus(id, status);
                         System.out.println("Cập nhật thành công!");
-                    } else {
-                        System.out.println("Thất bại!");
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
                     }
                     break;
 

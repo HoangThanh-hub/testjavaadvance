@@ -106,6 +106,7 @@ public class LoginMenu {
     }
 
     // login
+    // login
     private static void login() {
 
         System.out.print("Email: ");
@@ -125,15 +126,14 @@ public class LoginMenu {
             System.out.println("\nĐăng nhập thành công\n");
 
             // phân quyền
-            if ("ADMIN".equals(user.getRole())) {
+            if ("ADMIN".equalsIgnoreCase(user.getRole())) {
                 System.out.println("Xin chào Admin");
                 AdminMenu.menu();
-
             } else {
-                String name = user.getName();
-                System.out.println("Xin chào " +name);
+                System.out.println("Xin chào " + user.getName());
 
-                CustomerMenu.setCurrentUserId(user.getId());
+                // chỉ dùng 1 cách truyền user
+                CustomerMenu.setCurrentUser(user);
                 CustomerMenu.menu();
             }
 
@@ -141,4 +141,4 @@ public class LoginMenu {
             System.out.println("Sai tài khoản hoặc mật khẩu!");
         }
     }
-}
+    }
