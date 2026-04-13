@@ -26,15 +26,29 @@ public class ProductMenu {
             switch (choice) {
 
                 case 1:
-                    System.out.println("\n------------------------------------------------------------------------------------------------------------");
-                    System.out.printf("| %-3s | %-20s | %-10s | %-10s | %-10s | %-12s | %-8s | %-10s |\n",
-                            "ID","Tên sản phẩm", "Hãng", "Dung lượng", "Màu sắc", "Giá", "Số lượng", "Danh mục");
-                    System.out.println("------------------------------------------------------------------------------------------------------------");
+                    String control;
 
+                    do {
+                        System.out.println("\nTrang: " + ProductService.page);
 
-                    service.getAll().forEach(System.out::println);
-                    System.out.println("------------------------------------------------------------------------------------------------------------");
+                        System.out.println("------------------------------------------------------------------------------------------------------------");
+                        System.out.printf("| %-3s | %-20s | %-10s | %-10s | %-10s | %-12s | %-8s | %-10s |\n",
+                                "ID","Tên sản phẩm", "Hãng", "Dung lượng", "Màu sắc", "Giá", "Số lượng", "Danh mục");
+                        System.out.println("------------------------------------------------------------------------------------------------------------");
+                        service.getAll().forEach(System.out::println);
 
+                        System.out.println("------------------------------------------------------------------------------------------------------------");
+
+                        System.out.println("n - Trang tiếp | p - Trang trước | q - Thoát");
+                        control = sc.nextLine();
+
+                        if (control.equalsIgnoreCase("n")) {
+                            ProductService.page++;
+                        } else if (control.equalsIgnoreCase("p") && ProductService.page > 1) {
+                            ProductService.page--;
+                        }
+
+                    } while (!control.equalsIgnoreCase("q"));
 
                     break;
 
@@ -47,14 +61,49 @@ public class ProductMenu {
                 case 3:
                     System.out.print("ID: ");
                     int id = Integer.parseInt(sc.nextLine());
+
                     Product old = service.findById(id);
 
                     if (old != null) {
-                        Product newP = input();
-                        if (newP != null) {
-                            newP.setId(id);
-                            service.update(newP);
-                        }
+
+                        // Hiển thị thông tin cũ
+                        System.out.println("===== Thông tin cũ =====");
+                        System.out.println("ID: " + old.getId());
+                        System.out.println("Name: " + old.getName());
+                        System.out.printf("Price: %,.0f\n", old.getPrice());
+                        System.out.println("Stock: " + old.getStock());
+                        System.out.println("Category ID: " + old.getCategoryId());
+                        System.out.println("Describe: " + old.getDescription());
+
+                        System.out.println("===== Nhập thông tin mới =====");
+
+                        // Nhập mới
+                        Product newP = new Product();
+
+                        System.out.print("Name: ");
+                        newP.setName(sc.nextLine());
+
+                        System.out.print("Price: ");
+                        newP.setPrice(Double.parseDouble(sc.nextLine()));
+
+                        System.out.print("Stock: ");
+                        newP.setStock(Integer.parseInt(sc.nextLine()));
+
+                        System.out.print("Category ID: ");
+                        newP.setCategoryId(Integer.parseInt(sc.nextLine()));
+
+                        System.out.print("Describe: ");
+                        newP.setDescription(sc.nextLine());
+
+                        //Giữ nguyên ID cũ
+                        newP.setId(id);
+
+                        service.update(newP);
+
+                        System.out.println("Cập nhật thành công!");
+
+                    } else {
+                        System.out.println("Không tìm thấy sản phẩm!");
                     }
                     break;
 

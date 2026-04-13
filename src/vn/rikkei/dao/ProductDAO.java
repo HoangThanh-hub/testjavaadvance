@@ -8,19 +8,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProductDAO {
-
     // lấy tất cả
-    public List<Product> findAll() {
+    public List<Product> findAll(int page, int pageSize) {
         List<Product> list = new ArrayList<>();
 
         String sql = "SELECT p.*, c.name AS category_name " +
                 "FROM products p " +
                 "JOIN categories c ON p.category_id = c.id " +
-                "WHERE p.is_deleted = false AND p.stock > 0";
+                "WHERE p.is_deleted = false AND p.stock > 0 " +
+                "LIMIT ? OFFSET ?";
 
         try (Connection conn = ConnectionDB.openConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            int offset = (page - 1) * pageSize;
+
+            ps.setInt(1, pageSize);
+            ps.setInt(2, offset);
+
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
                 list.add(map(rs));
@@ -29,6 +35,7 @@ public class ProductDAO {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return list;
     }
 

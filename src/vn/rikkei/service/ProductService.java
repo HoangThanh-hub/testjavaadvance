@@ -6,11 +6,13 @@ import vn.rikkei.model.Product;
 import java.util.List;
 
 public class ProductService {
+    public static int page = 1;
+    public static int pageSize = 5;
 
     private ProductDAO dao = new ProductDAO();
 
     public List<Product> getAll() {
-        return dao.findAll();
+        return dao.findAll(page, pageSize);
     }
 
     public boolean add(Product p) {

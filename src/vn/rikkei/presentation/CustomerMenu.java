@@ -18,9 +18,9 @@ public class CustomerMenu {
     private static OrderService orderService = new OrderService();
     private static ProductService productService = new ProductService();
 
-    private static User currentUser; // 🔥 lưu user login
+    private static User currentUser; // lưu user login
 
-    // 👉 gọi từ login
+    //  gọi từ login
     public static void setCurrentUser(User user) {
         currentUser = user;
     }
